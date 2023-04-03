@@ -1,0 +1,5 @@
+import pandas as pd
+
+df = pd.read_csv('StudentsPerformance.csv')
+
+corr_matrix = df[['math_score', 'reading_score', 'writing_score']].corr()

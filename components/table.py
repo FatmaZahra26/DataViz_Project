@@ -10,6 +10,8 @@ import requests
 from io import BytesIO
 from PIL import Image
 
+
+
 # URL of the image to download
 male = "https://cdn-icons-png.flaticon.com/512/4537/4537047.png"
 female="https://cdn-icons-png.flaticon.com/512/4537/4537148.png"
@@ -84,6 +86,18 @@ class InteractiveDashboard(param.Parameterized):
         plt.ylabel('Gender')
         plt.tight_layout()
         return f
+    
+
+    def heatmap(self):
+        corr_matrix = df[['math_score', 'reading_score', 'writing_score']].corr()
+        fig, ax = plt.subplots(figsize=(8, 6))
+        sns.heatmap(corr_matrix, annot=True, fmt=".2f", linewidths=.5, cmap="coolwarm", ax=ax)
+        ax.set_title("Correlation Matrix")
+        ax.set_xticklabels(corr_matrix.columns, rotation=45)
+        ax.set_yticklabels(corr_matrix.columns, rotation=0)
+        plt.tight_layout()
+
+        return pn.panel(fig)
 
 """ 
     def plot2(self):
@@ -112,10 +126,11 @@ template = pn.template.FastListTemplate(
         })],
     sidebar_width=200,
     main=[
-    pn.Row( pn.pane.PNG(male,width=60),s2,dashboard.ind_gen1,s1,pn.pane.PNG(female,width=60),s2,dashboard.ind_gen2,s1,dashboard.ind_moy1,s1,dashboard.ind_moy2,s1,dashboard.ind_moy3),    pn.Row(dashboard.plot_table),
+    pn.Row( pn.pane.PNG(male,width=20),s2,dashboard.ind_gen1,s1,pn.pane.PNG(female,width=20),s2,dashboard.ind_gen2,s1,dashboard.ind_moy1,s1,dashboard.ind_moy2,s1,dashboard.ind_moy3),    pn.Row(dashboard.plot_table),
     pn.Row(dashboard.plot_barplot_stuck,dashboard.plot_scatter),
-    pn.Row(dashboard.plot_box),
-    pn.Row(plt.show(dashboard.plot_swarm()))],
+    pn.Row(dashboard.plot_box, dashboard.heatmap()),
+    pn.Row(dashboard.plot_swarm()),
+   ],
     accent_base_color="#1C4E80",
     header_background="#1C4E80",
     background_color="#EDF0F3",
