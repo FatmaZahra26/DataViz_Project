@@ -126,7 +126,7 @@ template = pn.template.FastListTemplate(
         })],
     sidebar_width=200,
     main=[
-    pn.Row( pn.pane.PNG(male,width=20),s2,dashboard.ind_gen1,s1,pn.pane.PNG(female,width=20),s2,dashboard.ind_gen2,s1,dashboard.ind_moy1,s1,dashboard.ind_moy2,s1,dashboard.ind_moy3),    pn.Row(dashboard.plot_table),
+    pn.Row( pn.pane.PNG(male,width=60),s2,dashboard.ind_gen1,s1,pn.pane.PNG(female,width=60),s2,dashboard.ind_gen2,s1,dashboard.ind_moy1,s1,dashboard.ind_moy2,s1,dashboard.ind_moy3),    pn.Row(dashboard.plot_table),
     pn.Row(dashboard.plot_barplot_stuck,dashboard.plot_scatter),
     pn.Row(dashboard.plot_box, dashboard.heatmap()),
     pn.Row(dashboard.plot_swarm()),
