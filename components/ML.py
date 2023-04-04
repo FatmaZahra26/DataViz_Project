@@ -32,7 +32,7 @@ df["Total_marks"]=((df.math_score+df.reading_score+df.writing_score)/3).round(2)
 # create a self-contained dashboard class
 class InteractiveDashboard(param.Parameterized):
     #parametres 
-    y_select = param.Selector(label='Score', objects=list(set(df.columns)-set(df.select_dtypes("object").columns)))
+    y_select = param.Selector(label='y_select', objects=list(set(df.columns)-set(df.select_dtypes("object").columns)))
 
     values_moyenne = [int(df['Total_marks'].between(70, 100).sum()*100/len(df)), int(df['Total_marks'].between(50, 70).sum()*100/len(df)), int(df['Total_marks'].between(0, 50).sum()*100/len(df))]
     ind_moy1=pn.indicators.Number(name='EXCELLENCE', value=values_moyenne[0], format='{value}%',colors=[(88, 'green')],font_size='20pt',title_size='12pt')
@@ -43,11 +43,25 @@ class InteractiveDashboard(param.Parameterized):
     ind_gen1=pn.indicators.Number(name='Male', value=values_gender[0], format='{value}%',default_color="blue",font_size='20pt',title_size='12pt')
     ind_gen2=pn.indicators.Number(name='Female', value=values_moyenne[1], format='{value}%',default_color="red",font_size='20pt',title_size='12pt')
 
-    @param.depends("y_select")
+    @pn.depends("y_select")
+    
     def plot_scatter(self):
-        df_scatter=df.hvplot.scatter(x='Total_marks' , y=self.y_select, title='Scatter', width=700, height=500)
+        df_scatter=df.hvplot.scatter(by=['gender'],x='Total_marks' , y=self.y_select, title='Scatter', width=700, height=500)
         return df_scatter
     
+    def regression_model(self):
+        y = df['Total_marks']
+        X = df.drop(['Total_marks', 'gender', 'race', 'parental_edu', 'test_prep','lunch'], axis=1)
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        lr_model = LinearRegression()
+        lr_model.fit(X_train, y_train)
+
+        #y_pred = lr_model.predict(X_test)
+        r2 = lr_model.score(X_test, y_test) * 100
+
+        return pn.indicators.Number(name='R2 score', value=r2, format='{value:.3f}',font_size='20pt',title_size='12pt')
 
 
 dashboard = InteractiveDashboard()
@@ -65,6 +79,7 @@ template = pn.template.FastListTemplate(
     pn.Row(dashboard.ind_moy1, s1, dashboard.ind_moy2, s1, dashboard.ind_moy3, align="center") ,
 
     pn.Row(dashboard.plot_scatter()),
+    pn.Row(dashboard.regression_model()),
     ],
     accent_base_color="#1C4E80",
     header_background="#1C4E80",
