@@ -13,6 +13,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 
+
 # URL of the image to download
 male = "https://cdn-icons-png.flaticon.com/512/4537/4537047.png"
 female="https://cdn-icons-png.flaticon.com/512/4537/4537148.png"
@@ -32,37 +33,38 @@ df["Total_marks"]=((df.math_score+df.reading_score+df.writing_score)/3).round(2)
 # create a self-contained dashboard class
 class InteractiveDashboard(param.Parameterized):
     #parametres 
-    y_select = param.Selector(label='y_select', objects=list(set(df.columns)-set(df.select_dtypes("object").columns)))
-
+    score = param.Selector(label='Score', objects=list(set(df.columns)-set(df.select_dtypes("object").columns)))    
+    
     values_moyenne = [int(df['Total_marks'].between(70, 100).sum()*100/len(df)), int(df['Total_marks'].between(50, 70).sum()*100/len(df)), int(df['Total_marks'].between(0, 50).sum()*100/len(df))]
     ind_moy1=pn.indicators.Number(name='EXCELLENCE', value=values_moyenne[0], format='{value}%',colors=[(88, 'green')],font_size='20pt',title_size='12pt')
     ind_moy2=pn.indicators.Number(name='MEDIOCRITY', value=values_moyenne[1], format='{value}%',colors=[(66, 'gold')],font_size='20pt',title_size='12pt')
     ind_moy3=pn.indicators.Number(name='FAILURE', value=values_moyenne[2],format='{value}%',colors=[(100, 'red')],font_size='20pt',title_size='12pt')
 
-    values_gender=[len(df[df.gender=="male"])*100/len(df),len(df[df.gender=="female"])*100/len(df)]
+    values_gender=[round(len(df[df.gender=="male"])/len(df)*100,3),round(len(df[df.gender=="female"])/len(df)*100,2)]
     ind_gen1=pn.indicators.Number(name='Male', value=values_gender[0], format='{value}%',default_color="blue",font_size='20pt',title_size='12pt')
-    ind_gen2=pn.indicators.Number(name='Female', value=values_moyenne[1], format='{value}%',default_color="red",font_size='20pt',title_size='12pt')
+    ind_gen2=pn.indicators.Number(name='Female', value=values_gender[1], format='{value}%',default_color="red",font_size='20pt',title_size='12pt')
 
-    @pn.depends("y_select")
-    
+    #tableau
+    @pn.depends('score')
     
     def plot_scatter(self):
-        df_scatter=df.hvplot.scatter(by=['gender'],x='Total_marks' , y=self.y_select, title='Scatter', width=700, height=500)
+        df_scatter=df.hvplot.scatter(by="gender", title='Scatter', x='Total_marks', y=self.score ,width=700, height=500)
         return df_scatter
     
     def regression_model(self):
-        y = df['Total_marks']
-        X = df.drop(['Total_marks', 'gender', 'race', 'parental_edu', 'test_prep','lunch'], axis=1)
-
+        y = df[self.score]
+        X = df.drop([self.score ,'gender', 'race', 'parental_edu', 'test_prep','lunch'], axis=1)
+        
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         lr_model = LinearRegression()
         lr_model.fit(X_train, y_train)
 
-        #y_pred = lr_model.predict(X_test)
         r2 = lr_model.score(X_test, y_test) * 100
+        score = pn.indicators.Number(name='R2 score', value=r2, format='{value:.3f}',font_size='20pt',title_size='12pt')
+        return score
 
-        return pn.indicators.Number(name='R2 score', value=r2, format='{value:.3f}',font_size='20pt',title_size='12pt')
+
 
 
 dashboard = InteractiveDashboard()
@@ -72,16 +74,16 @@ dashboard = InteractiveDashboard()
 template = pn.template.FastListTemplate(
     title='Machine Learning', 
     sidebar=[pn.Param(dashboard.param, width=200, widgets={
-        'y_select': pn.widgets.Select,
-          })],
+        'score': pn.widgets.Select,
+    })],
     sidebar_width=200,
     main=[
     pn.Row( pn.pane.PNG(male, width=60), s2, dashboard.ind_gen1, s1, pn.pane.PNG(female, width=60), dashboard.ind_gen2, align="center"),
     pn.Row(dashboard.ind_moy1, s1, dashboard.ind_moy2, s1, dashboard.ind_moy3, align="center") ,
-
-    pn.Row(dashboard.plot_scatter()),
+    pn.Row(pn.pane.Markdown('## Scatter Plot'),dashboard.plot_scatter),
     pn.Row(dashboard.regression_model()),
     ],
+
     accent_base_color="#1C4E80",
     header_background="#1C4E80",
     background_color="#EDF0F3",

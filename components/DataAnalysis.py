@@ -45,9 +45,9 @@ class InteractiveDashboard(param.Parameterized):
     ind_moy2=pn.indicators.Number(name='MEDIOCRITY', value=values_moyenne[1], format='{value}%',colors=[(66, 'gold')],font_size='20pt',title_size='12pt')
     ind_moy3=pn.indicators.Number(name='FAILURE', value=values_moyenne[2],format='{value}%',colors=[(100, 'red')],font_size='20pt',title_size='12pt')
 
-    values_gender=[len(df[df.gender=="male"])*100/len(df),len(df[df.gender=="female"])*100/len(df)]
+    values_gender=[round(len(df[df.gender=="male"])/len(df)*100,3),round(len(df[df.gender=="female"])/len(df)*100,2)]
     ind_gen1=pn.indicators.Number(name='Male', value=values_gender[0], format='{value}%',default_color="blue",font_size='20pt',title_size='12pt')
-    ind_gen2=pn.indicators.Number(name='Female', value=values_moyenne[1], format='{value}%',default_color="red",font_size='20pt',title_size='12pt')
+    ind_gen2=pn.indicators.Number(name='Female', value=values_gender[1], format='{value}%',default_color="red",font_size='20pt',title_size='12pt')
 
 
     #tableau
