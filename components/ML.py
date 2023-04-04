@@ -45,6 +45,7 @@ class InteractiveDashboard(param.Parameterized):
 
     @pn.depends("y_select")
     
+    
     def plot_scatter(self):
         df_scatter=df.hvplot.scatter(by=['gender'],x='Total_marks' , y=self.y_select, title='Scatter', width=700, height=500)
         return df_scatter

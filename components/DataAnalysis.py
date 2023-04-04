@@ -60,25 +60,19 @@ class InteractiveDashboard(param.Parameterized):
         return df_widget
     
     def plot_scatter(self):
-        df_scatter=df.hvplot.scatter(by=['gender'], title='Scatter', x='writing_score', y=self.score,width=500, height=400)
+        df_scatter=df.hvplot.scatter(by="gender", title='Scatter', x='Total_marks', y=self.score ,width=500, height=400)
         return df_scatter
     
     @pn.depends('race', 'gender', 'score','lunch','parental_edu','test_prep')
 
     def plot_box(self):
-        df_box = df.hvplot.box(y=['math_score', 'reading_score', 'writing_score'], 
-                legend=False, value_label='Score Box Plot', invert=True,width=600, height=300)
+        df_box = df.hvplot.box(y=['math_score', 'reading_score', 'writing_score','Total_marks'], 
+                legend=False, value_label='Score Box Plot', invert=True,width=600, height=300,
+                )
 
         return df_box 
     
-
-    @param.depends("gender_parent")
-    def plot_barplot_stuck(self):
-        counts = df.groupby(['race', self.gender_parent]).size().reset_index(name='Count')
-        return counts.hvplot.bar('race', 'Count', by=self.gender_parent, stacked=True, rot=90, hover_cols=['Filter'],width=600, height=400)
-    
-    @param.depends("score")
-
+    @pn.depends('score')
     def plot_swarm(self):
         sns.set_style('whitegrid')
         f, ax = plt.subplots(1,1,figsize= (8,6))
@@ -88,7 +82,7 @@ class InteractiveDashboard(param.Parameterized):
         plt.ylabel('Gender')
         plt.tight_layout()
         return f
-
+    
     def heatmap(self):
         corr_matrix = df[['math_score', 'reading_score', 'writing_score']].corr()
         fig, ax = plt.subplots(figsize=(6, 6))
@@ -99,6 +93,12 @@ class InteractiveDashboard(param.Parameterized):
         plt.tight_layout()
 
         return pn.panel(fig)
+
+    @pn.depends("gender_parent")
+    def plot_barplot_stuck(self):
+        counts = df.groupby(['race', self.gender_parent]).size().reset_index(name='Count')
+        return counts.hvplot.bar('race', 'Count', by=self.gender_parent, stacked=True, rot=90, hover_cols=['Filter'],width=600, height=400)
+    
 
 
     def score_distribution(self):
@@ -134,7 +134,7 @@ template = pn.template.FastListTemplate(
     pn.Column(pn.pane.Markdown('## Heatmap'),dashboard.heatmap())
     ),
 
-    pn.Row(pn.Column(dashboard.plot_swarm(), dashboard.score)),
+    pn.Row(dashboard.plot_swarm()),
     pn.Row(dashboard.score_distribution()),
     ],
     accent_base_color="#1C4E80",
