@@ -106,18 +106,37 @@ class InteractiveDashboard(param.Parameterized):
 
         return pn.Row(s1,r2_s,s3,rmse_s)
     
-    @pn.depends(x.param.value, y.param.value, n_clusters.param.value)
+    @pn.depends('y_select','x_select1', n_clusters.param.value)
     def get_clusters(self):
         scaler=StandardScaler()
-        X = scaler.fit_transform(df[['math_score', 'reading_score', 'writing_score']])
-        kmeans = KMeans(X)
+        X_scaled = scaler.fit_transform(df.loc[:,['math_score', 'reading_score', 'writing_score']])
+        k=self.n_clusters.param.value
+        kmeans = KMeans(n_clusters=k,random_state=40).fit(X_scaled)
+        
         labels = kmeans.labels_.astype(str)
-        centers = X.groupby('labels').mean()
-        return (X.sort_values('labels').hvplot.scatter(X, y, c='labels', size=100, height=500) *
-                centers.hvplot.scatter(X, y, marker='x', color='black', size=400,
-                                    padding=0.1, line_width=5))
+        df['labels'] = labels
 
-
+        centers = pd.DataFrame(kmeans.cluster_centers_, columns=["math_score", "reading_score", "writing_score"]).mean()
+        centers["labels"] = centers.index.astype(str)
+        return (
+                    df.sort_values('labels').hvplot.scatter(
+                        x=self.x_select1.param.value, 
+                        y=self.y_select.param.value, 
+                        c='labels', 
+                        size=100, 
+                        height=500
+                    ) *
+                    centers.hvplot.scatter(
+                        x=self.x_select1.param.value, 
+                        y=self.y_select.param.value, 
+                        marker='x', 
+                        color='black', 
+                        size=400,
+                        padding=0.1, 
+                        line_width=5
+                    )
+                )
+    
 
 dashboard = InteractiveDashboard()
 # Layout using Template
