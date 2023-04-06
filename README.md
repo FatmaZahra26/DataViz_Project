@@ -19,15 +19,15 @@ The data application is designed to have two dashboards:
 
 The project will be implemented using the following technologies:
 
-- Python
 - Pandas
 - Numpy
 - Scikit-learn
-- Matplotlib
 - Seaborn
 - Plotly go
 - HoloViews
+- Hvplot
 - Panel
+- Bokeh
 
 
 ## Dataset
