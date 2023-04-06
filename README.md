@@ -35,11 +35,13 @@ link of the dataset : https://www.kaggle.com/datasets/spscientist/students-perfo
   
 ## Installation
 To install the necessary packages, run the following command:
+
 `pip install -r requirements.txt`
 
 ## Usage
 
-To view the website, run the following command
+To view the website, run the following command : 
+
 `panel serve DataAnalysis.py ML.py --index=HomePage.html`
 
 
