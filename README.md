@@ -9,7 +9,9 @@ The purpose of this project is to answer a business question related to the data
 The data application is designed to have two dashboards: 
 
 1. Home Page: This will be the landing page from which all other dashboards will be accessible. 
+
 2. Exploration Dashboard: This dashboard will allow users to explore the dataset using various filters (columns of the dataset). It will include plots such as bar plots, scatter plots, box plots, pie plots, etc. 
+
 3. Analysis Dashboard: This dashboard will present the results of the analysis and the answer to the business question. Machine learning algorithms Linear Regression and  Clustering.
 
 
@@ -31,6 +33,7 @@ The project will be implemented using the following technologies:
 ## Dataset
 
 The dataset for this project is the "Students Performance in Exams" dataset which contains information on student performance in math, reading and writing exams. The dataset contains information on various factors such as gender, race/ethnicity, parental level of education, lunch, test preparation course, etc.
+
 link of the dataset : https://www.kaggle.com/datasets/spscientist/students-performance-in-exams
   
 ## Installation
